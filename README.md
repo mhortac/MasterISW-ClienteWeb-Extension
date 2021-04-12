@@ -33,13 +33,38 @@ Elegimos TypeScript como tipo de lenguaje de desarrollo: New Extension (TypeScri
 
 Primero, haremos una importación de vscode con la siguiente línea de código.
 
-`import * as vscode from 'vscode';`
+```
+// Es una forma de elegir una variante restringida de JavaScript,
+// así implícitamente se deja de lado el modo poco riguroso
+"use strict";
+// The module 'vscode' contains the VS Code extensibility API
+// Import the module and reference it with the alias vscode in your code below
+import * as vscode from "vscode";
+```
 
 Luego, exportaremos dos funciones, `activate` que es ejecutada cuando se emite un `actionEvent` y deactivate que nos brinda la oportunidad de limpiar antes de que la extensión sea desactivada.
 
-1. Vinculemos una función a nuestra extensión. Para esto haremos uso del `vscode.commands.registerCommand` Que recibe como parámetros un identificador único para el comando, seguido de una función de controlador de comandos en la cual colocaremos la lógica de nuestra extensión.
+```
+/**
+ * Este método es llamada cuando la extensión es activada.
+ * La extensión es activada la primera vez que el comando es ejecutado.
+ * @param context {vscode.ExtensionContext}
+ */
+export function activate(context: vscode.ExtensionContext) {
 
-La función completa quedaría de la siguiente manera.
+}
+
+/**
+ * Este método es llamadado cuando la extensión es desactivada
+ */
+ export function deactivate() {
+
+ }
+```
+
+Vinculemos una función a nuestra extensión. Para esto haremos uso del `vscode.commands.registerCommand`Quién recibe como parámetros un identificador único para el comando, seguido de una función de controlador de comandos en la cual colocaremos la lógica de nuestra extensión.
+
+En la siguiente imagen mostraremos la función completa e identificaremos, elementos propios de **TypeScript**, como los es el uso de Interface que nos permite determinar la estructura que debería o puede tener un objeto, variable o parámetro. Lo podemos evidenciar en las línea 12 con el parámetro **context**, en la línea 34 donde indicamos que **textInChunks** será un array de `string` y en la línea 37 donde indicamos que **currentLine** es de tipo `string`
 
 ```
 export function activate(context: vscode.ExtensionContext) {
