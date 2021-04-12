@@ -68,43 +68,51 @@ En la siguiente imagen mostraremos la función completa e identificaremos, eleme
 
 ```
 export function activate(context: vscode.ExtensionContext) {
+  // Registra un comando que se puede invocar mediante un método abreviado de teclado,
+  // un elemento de menú, una acción o directamente.
+  let disposable = vscode.commands.registerCommand("gapline", () => {
+    // Obtiene el editor de texto activo en el momento
+    var editor = vscode.window.activeTextEditor;
+    // Termina la función en caso de que editor sea `undefined`
+    if (!editor) {
+      return;
+    }
 
-    // Registra un comando que se puede invocar mediante un método abreviado de teclado,
-    // un elemento de menú, una acción o directamente.
-    let disposable = vscode.commands.registerCommand('extension.gapline', () => {
+    // Obtiene el rango de selección.
+    var selection = editor.selection;
+    // Obtiene el texto de acuerdo al rango seleccionado.
+    var text = editor.document.getText(selection);
+    // Muestra una ventana de ingreso de texto
+    vscode.window
+      .showInputBox({ prompt: "¿Cantidad de lineas?" })
+      .then((value) => {
+        // Obtiene el valor convertido a entero
+        let numberOfLines = +value;
+        // Array en el cual agregaremos nuestras líneas seleccionadas y las nuevas
+        var textInChunks: Array<string> = [];
+        // Separa el texto seleccionado por saltos de líneas con ayuda de la función split quien retorna un array.
+        // Este array es iterado  para evaluar cada cuantas líneas agrega una nueva vacía, esto, a partir del mod u operación residuo
+        text.split("\n").forEach((currentLine: string, lineIndex) => {
+          textInChunks.push(currentLine);
+          if ((lineIndex + 1) % numberOfLines === 0) textInChunks.push("");
+        });
 
-        // Obtiene el editor de texto activo en el momento
-        var editor = vscode.window.activeTextEditor;
-        // Termina la función en caso de que editor sea `undefined`
-        if (!editor) { return; }
-
-        // Obtiene el rango de selección.
-        var selection = editor.selection;
-        // Obtiene el texto de acuerdo al rango seleccionado.
-        var text = editor.document.getText(selection);
-
-        // Muestra una ventana de ingreso de texto
-        vscode.window.showInputBox({ prompt: '¿Cantidad de lineas?' }).then(value => {
-            // Obtiene el valor convertido a entero
-            let numberOfLines = +value;
-
-            var textInChunks: Array<string> = [];
-            text.split('\n').forEach((currentLine: string, lineIndex) => {
-                textInChunks.push(currentLine);
-                if ((lineIndex+1) % numberOfLines === 0) textInChunks.push('');
-            });
-            text = textInChunks.join('\n');
-            editor.edit((editBuilder) => {
-                var range = new vscode.Range(
-                    selection.start.line, 0,
-                    selection.end.line,
-                    editor.document.lineAt(selection.end.line).text.length
-                );
-                editBuilder.replace(range, text);
-            });
-        })
-    });
-    context.subscriptions.push(disposable);
+        // Unimos las líneas en una sola
+        text = textInChunks.join("\n");
+        // Agregamos el texto en el editor a partir el rango seleccionado
+        editor.edit((editBuilder) => {
+          var range = new vscode.Range(
+            selection.start.line,
+            0,
+            selection.end.line,
+            editor.document.lineAt(selection.end.line).text.length
+          );
+          editBuilder.replace(range, text);
+        });
+      });
+  });
+  // Agrega lo desarrollado a nuestro contexto del editor
+  context.subscriptions.push(disposable);
 }
 
 ```
